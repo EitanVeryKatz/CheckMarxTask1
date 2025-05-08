@@ -1,7 +1,7 @@
 import os
 import requests
 
-def download_package(i_package_name, i_version, i_download_dir="downloads"):
+def download_package(i_package_name, i_version, i_download_dir="Downloads"):
     url = f"https://pypi.org/pypi/{i_package_name}/json"
 
     try:
@@ -26,12 +26,16 @@ def download_package(i_package_name, i_version, i_download_dir="downloads"):
         filename = tarball["filename"]
 
         # Create the download directory if it doesn't exist
-        os.makedirs(download_dir, exist_ok=True)
-        filepath = os.path.join(download_dir, filename)
+        os.makedirs(i_download_dir, exist_ok=True)
+        print("got download dir")
+        filepath = os.path.join(i_download_dir, filename)
+        print("got filepath")
+        
 
         # Download the file
         print(f"Downloading {filename}...")
         file_response = requests.get(download_url, stream=True)
+        print(f"got file response{file_response.status_code}")
         file_response.raise_for_status()
 
         # Save the file to the specified directory

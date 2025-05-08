@@ -1,4 +1,4 @@
-
+﻿
 from version_fetcher import getLatestVersion
 from downloadPackage import download_package
 
