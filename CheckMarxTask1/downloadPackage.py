@@ -8,6 +8,7 @@ def download_package(i_package_name, i_version, i_download_dir="downloads"):
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
+        print("got Json data")
 
         # Check if the version exists
         release_files = data["releases"][i_version]
@@ -17,6 +18,8 @@ def download_package(i_package_name, i_version, i_download_dir="downloads"):
         if tarball is None:
             print("No source distribution (.tar.gz) found.")
             return None
+        else:
+            print("got tarball")
 
 
         download_url = tarball["url"]
