@@ -9,7 +9,7 @@ def getLatestVersion(i_packageName):
     """
 
 
-    url = f"https://pypi.org/pypi/{i_packageName}/json"
+    url = f"https://pypi.org/project/{i_packageName}//json"
     
     try:
         response = requests.get(url, timeout = 10)
