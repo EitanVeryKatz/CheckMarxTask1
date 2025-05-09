@@ -38,7 +38,7 @@ def findDependencyFiles(i_extractPath):
                 full_path = os.path.join(root, name)
                 with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
                     found[name] = f.read()
-                    print(f"Found {name} in {full_path}")
+                    print(f"Found item {name} in {full_path}")
                     
     for fileName in potentialFiles:
         if fileName not in found:
@@ -64,8 +64,8 @@ def parseRequirements(i_requirements):
                 line = line.strip()
                 if line and not line.startswith("#"):
                     dependencies.append(line)
-    for item in dependencies:
-        print(f"Found dependency: {item}")
+                    print(f"added dependancy {line} from requirements.txt")
+    dependencies = list(set(dependencies))
     print(f"Dependencies found: {dependencies}")
     return dependencies
 
@@ -84,17 +84,20 @@ def ParseSetupPy(i_setupPy,dependancies):
                                 if isinstance(item, ast.Str):  # For Python <3.8
                                     string_value = item.s
                                     dependancies.append(string_value)
-                                    print(f"added dependancy{string_value}")
+                                    print(f"added dependancy {string_value} from setup.py")
                                 elif isinstance(item, ast.Constant) and isinstance(item.value, str):
                                     string_value = item.value
                                     dependancies.append(string_value)
-                                    print(f"added dependancy{string_value}")
+                                    print(f"added dependancy {string_value}from setup.py")
                                 
             self.generic_visit(node)
 
     tree = ast.parse(i_setupPy)
-    visitor = SetupVisitor()
-    visitor.visit(tree)
+    try:
+         visitor = SetupVisitor()
+         visitor.visit(tree)
+    except Exception as e:
+        print(f"Error parsing setup.py: {e}")
     return 
 
 
@@ -107,7 +110,7 @@ def parse_pyproject_toml(path,dependancies):
             for item in data["build-system"]["requires"]:
                 if isinstance(item, str):
                     dependancies.append(item)
-                    print(f"added dependancy{item}")
+                    print(f"added dependancy {item} from toml")
     except Exception as e:
         print(f"Error parsing pyproject.toml: {e}")
         
