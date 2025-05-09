@@ -1,8 +1,11 @@
+﻿import ast
 from doctest import debug_script
 from msilib.schema import File
+import ast
 import tarfile
 import os
 import sys
+import toml
 
 def extractTarball(i_filepath, i_extract_to):
     try:
@@ -49,11 +52,11 @@ def parseRequirements(i_requirements):
     dependencies = []
     for fileName, fileContent in i_requirements.items():
         if fileName == "setup.py":
-            # Parse setup.py for dependencies
-            pass
+            ParseSetupPy(fileContent,dependencies)
+                
         elif fileName == "pyproject.toml":
             # Parse pyproject.toml for dependencies
-            pass
+            parse_pyproject_toml(fileContent,dependencies)  
         elif fileName == "requirements.txt":
             # Parse requirements.txt for dependencies
             lines = fileContent.splitlines()
@@ -61,5 +64,50 @@ def parseRequirements(i_requirements):
                 line = line.strip()
                 if line and not line.startswith("#"):
                     dependencies.append(line)
+    for item in dependencies:
+        print(f"Found dependency: {item}")
     print(f"Dependencies found: {dependencies}")
     return dependencies
+
+
+
+def ParseSetupPy(i_setupPy,dependancies):
+    
+    class SetupVisitor(ast.NodeVisitor):
+        
+        def visit_Call(self, node):
+            if isinstance(node.func, ast.Name) and node.func.id == "setup":
+                for keyword in node.keywords:
+                    if "require" in keyword.arg:
+                        if isinstance(keyword.value, ast.List) or isinstance(keyword.value, ast.Tuple) or isinstance(keyword.value, ast.Dict):
+                            for item in keyword.value.values:
+                                if isinstance(item, ast.Str):  # For Python <3.8
+                                    string_value = item.s
+                                    dependancies.append(string_value)
+                                    print(f"added dependancy{string_value}")
+                                elif isinstance(item, ast.Constant) and isinstance(item.value, str):
+                                    string_value = item.value
+                                    dependancies.append(string_value)
+                                    print(f"added dependancy{string_value}")
+                                
+            self.generic_visit(node)
+
+    tree = ast.parse(i_setupPy)
+    visitor = SetupVisitor()
+    visitor.visit(tree)
+    return 
+
+
+
+
+def parse_pyproject_toml(path,dependancies):
+    try:
+        data = toml.loads(path)
+        if "build-system" in data and "requires" in data["build-system"]:
+            for item in data["build-system"]["requires"]:
+                if isinstance(item, str):
+                    dependancies.append(item)
+                    print(f"added dependancy{item}")
+    except Exception as e:
+        print(f"Error parsing pyproject.toml: {e}")
+        
