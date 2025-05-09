@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="downloadPackage.py" />
+    <Compile Include="tarExtractor.py" />
     <Compile Include="test_fetch.py">
       <SubType>Code</SubType>
     </Compile>
