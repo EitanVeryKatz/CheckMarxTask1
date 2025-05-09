@@ -1,3 +1,4 @@
+from doctest import debug_script
 from msilib.schema import File
 import tarfile
 import os
@@ -39,5 +40,26 @@ def findDependencyFiles(i_extractPath):
     for fileName in potentialFiles:
         if fileName not in found:
             print(f"{fileName} not found")
+            
+    return parseRequirements(found)
 
-    return found
+
+#get list of all dependancies   
+def parseRequirements(i_requirements):
+    dependencies = []
+    for fileName, fileContent in i_requirements.items():
+        if fileName == "setup.py":
+            # Parse setup.py for dependencies
+            pass
+        elif fileName == "pyproject.toml":
+            # Parse pyproject.toml for dependencies
+            pass
+        elif fileName == "requirements.txt":
+            # Parse requirements.txt for dependencies
+            lines = fileContent.splitlines()
+            for line in lines:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    dependencies.append(line)
+    print(f"Dependencies found: {dependencies}")
+    return dependencies
