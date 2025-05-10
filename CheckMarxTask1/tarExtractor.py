@@ -41,10 +41,33 @@ def extractFile(i_filepath, i_extract_to):
 
 
 
-def findDependencyFiles(i_extractPath):
+
+
+# def findDependencyFiles(i_extractPath):
     
-    potentialFiles = ["setup.py", "pyproject.toml", "requirements.txt"]
+#     potentialFiles = ["setup.py", "pyproject.toml", "requirements.txt"]
+#     found = {}
+
+#     for root, dirs, files in os.walk(i_extractPath):
+#         for name in potentialFiles:
+#             if name in files:
+#                 full_path = os.path.join(root, name)
+#                 with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
+#                     found[name] = f.read()
+#                     print(f"Found item {name} in {full_path}")
+                    
+#     for fileName in potentialFiles:
+#         if fileName not in found:
+#             print(f"{fileName} not found")
+            
+#     return parseRequirements(found)
+
+
+
+def findDependencyFiles(i_extractPath):
+    potentialFiles = {"setup.py", "pyproject.toml", "requirements.txt"}
     found = {}
+    metadata_path = None
 
     for root, dirs, files in os.walk(i_extractPath):
         for name in potentialFiles:
@@ -54,11 +77,50 @@ def findDependencyFiles(i_extractPath):
                     found[name] = f.read()
                     print(f"Found item {name} in {full_path}")
                     
+        for dirname in dirs:
+            if dirname.endswith(".dist-info"):
+                candidate = os.path.join(root, dirname, "METADATA")
+                if os.path.isfile(candidate):
+                    metadata_path = candidate
+                    break 
+                
+    if metadata_path:
+        try:
+            with open(metadata_path, "r", encoding="utf-8", errors="ignore") as f:
+                found["METADATA"] = f.read()
+                print(f"Found item METADATA in {metadata_path}")
+        except Exception as e:
+            print(f"Failed to read METADATA in {metadata_path}: {e}")
+    
+
+  
     for fileName in potentialFiles:
         if fileName not in found:
             print(f"{fileName} not found")
-            
+
     return parseRequirements(found)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #get list of all dependancies   
@@ -104,14 +166,7 @@ def ParseSetupPy(i_setupPy,dependancies):
                     if "require" in keyword.arg:
                         if isinstance(keyword.value, ast.Dict):
                             for item in keyword.value.values:
-                                string_value = None
-                                if isinstance(item, ast.Str):  # For Python <3.8
-                                   string_value = item.s
-                                elif isinstance(item, ast.Constant) and isinstance(item.value, str):
-                                   string_value = item.value
-                                if string_value:
-                                    dependancies.append(string_value)
-                                    print(f"added dependancy {string_value}from setup.py")
+                                searchDependenciesInAstObject(item, dependancies)
                         elif isinstance(keyword.value, ast.List):
                             for item in keyword.value.elts:
                                 searchDependenciesInAstObject(item, dependancies)
@@ -137,7 +192,7 @@ def searchDependenciesInAstObject(item, dependancies):
         string_value = item.value
     if string_value:
         dependancies.append(string_value)
-        print(f"added dependancy {string_value}from setup.py")
+        print(f"added dependancy {string_value} from setup.py")
     return None
 
 
