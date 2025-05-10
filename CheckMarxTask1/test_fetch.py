@@ -2,7 +2,7 @@
 from re import I
 from version_fetcher import getLatestVersion
 from downloadPackage import download_package
-from tarExtractor import extractTarball
+from tarExtractor import *
 
 
 
@@ -17,6 +17,10 @@ def main():
             print(f"Downloaded file: {file}")
             if extractTarball(file, "extracted"):
                 print(f"Extracted to 'extracted' directory.")
+                if findDependencyFiles("extracted"):
+                    print("Dependency files found.")
+                else:
+                    print("No dependency files found.")
             else:
                 print("Failed to extract the tarball.")
         else:
