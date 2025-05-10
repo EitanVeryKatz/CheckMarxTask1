@@ -12,7 +12,7 @@ import toml
 
 
 
-def extractTarball(i_filepath, i_extract_to):
+def extractFile(i_filepath, i_extract_to):
     try:
         print("began extraction process")
         limitedPathLengthsOS = ("win32","win64")
@@ -22,14 +22,23 @@ def extractTarball(i_filepath, i_extract_to):
                 i_extract_to = f"\\\\?\\{i_extract_to}"
                 
 
-        with tarfile.open(i_filepath, "r:gz") as tar:
-            tar.extractall(path=i_extract_to)
+        if i_filepath.endswith(".tar.gz") or i_filepath.endswith(".tar"):
+            #tarball extraction 
+             with tarfile.open(i_filepath, "r:gz") as tar:
+                tar.extractall(path=i_extract_to)
+        elif i_filepath.endswith(".tar"):
+            #zip extraction
+            with tarfile.open(i_filepath, "r") as tar:
+                tar.extractall(path=i_extract_to)
+                
         print(f"Extracted to {i_extract_to}")
         return True
     
     except Exception as exceptionMessage:
         print(f"Failed to extract tarball: {exceptionMessage}")
         return False
+
+
 
 
 def findDependencyFiles(i_extractPath):
@@ -95,7 +104,14 @@ def ParseSetupPy(i_setupPy,dependancies):
                     if "require" in keyword.arg:
                         if isinstance(keyword.value, ast.Dict):
                             for item in keyword.value.values:
-                                searchDependenciesInAstObject(item, dependancies)
+                                string_value = None
+                                if isinstance(item, ast.Str):  # For Python <3.8
+                                   string_value = item.s
+                                elif isinstance(item, ast.Constant) and isinstance(item.value, str):
+                                   string_value = item.value
+                                if string_value:
+                                    dependancies.append(string_value)
+                                    print(f"added dependancy {string_value}from setup.py")
                         elif isinstance(keyword.value, ast.List):
                             for item in keyword.value.elts:
                                 searchDependenciesInAstObject(item, dependancies)
@@ -114,7 +130,7 @@ def ParseSetupPy(i_setupPy,dependancies):
     return None
 
 def searchDependenciesInAstObject(item, dependancies):
-    
+    string_value = None
     if isinstance(item, ast.Str):  # For Python <3.8
         string_value = item.s
     elif isinstance(item, ast.Constant) and isinstance(item.value, str):
@@ -219,7 +235,7 @@ def main():
         file = download_package(pkg, version)
         if file:
             print(f"Downloaded file: {file}")
-            if extractTarball(file, "extracted"):
+            if extractFile(file, "extracted"):
                 print(f"Extracted to 'extracted' directory.")
                 return findDependencyFiles("extracted")
             else:
@@ -230,5 +246,24 @@ def main():
     else:
         print("Failed to fetch version.")
         
+
+def extract_whl(i_filepath, i_extract_to):
+    try:
+        print("began extraction process")
+        limitedPathLengthsOS = ("win32","win64")
+        if sys.platform in limitedPathLengthsOS:
+            i_extract_to = os.path.abspath(i_extract_to)
+            if not i_extract_to.startswith("\\\\?\\"):
+                i_extract_to = f"\\\\?\\{i_extract_to}"
+                
+
+       
+    
+    except Exception as exceptionMessage:
+
+        print(f"Failed to extract tarball: {exceptionMessage}")
+        return False
+
+
 if __name__ == "__main__":
     main()
