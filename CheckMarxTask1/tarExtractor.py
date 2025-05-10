@@ -8,6 +8,8 @@ import tarfile
 import os
 import sys
 import toml
+import zipfile
+
 
 
 
@@ -39,28 +41,6 @@ def extractFile(i_filepath, i_extract_to):
         return False
 
 
-
-
-
-
-# def findDependencyFiles(i_extractPath):
-    
-#     potentialFiles = ["setup.py", "pyproject.toml", "requirements.txt"]
-#     found = {}
-
-#     for root, dirs, files in os.walk(i_extractPath):
-#         for name in potentialFiles:
-#             if name in files:
-#                 full_path = os.path.join(root, name)
-#                 with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
-#                     found[name] = f.read()
-#                     print(f"Found item {name} in {full_path}")
-                    
-#     for fileName in potentialFiles:
-#         if fileName not in found:
-#             print(f"{fileName} not found")
-            
-#     return parseRequirements(found)
 
 
 
@@ -137,6 +117,9 @@ def parseRequirements(i_requirements):
         elif fileName == "requirements.txt":
             # Parse requirements.txt for dependencies
             parse_requirements_txt(fileContent,dependencies)
+        elif fileName == "METADATA":
+            # Parse METADATA for dependencies
+            parse_metadata_file(fileContent,dependencies)
             
     # Remove duplicates
     dependencies = list(set(dependencies))
@@ -154,6 +137,15 @@ def parse_requirements_txt(fileContent, dependancies):
             dependancies.append(line)
             print(f"added dependancy {line} from requirements.txt")
     return None
+
+def parse_metadata_file(fileContent, dependencies):
+    lines = fileContent.splitlines()
+    for line in lines:
+        line = line.strip()
+        if line.startswith("Requires-Dist:"):
+            dep = line[len("Requires-Dist:"):].strip()
+            dependencies.append(dep)
+            print(f"added dependency {dep} from METADATA")
 
 
 def ParseSetupPy(i_setupPy,dependancies):
