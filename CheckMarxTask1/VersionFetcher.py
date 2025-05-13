@@ -1,12 +1,20 @@
 import requests
 
 def getLatestVersion(i_packageName):
-    """
-    Receives package name
-    Returns the latest version of the package
-    or None if failed to retrieve
-    """
-    # Corrected the URL
+    """  
+    Retrieves the latest version of a package from the PyPI repository.  
+
+    Args:  
+        i_packageName (str): The name of the package to query.  
+
+    Returns:  
+        str: The latest version of the package as a string if successful.  
+        None: If the request fails or the package information cannot be retrieved.  
+
+    Raises:  
+        requests.exceptions.RequestException: If there is an issue with the HTTP request.  
+    """  
+  
     url = f"https://pypi.org/pypi/{i_packageName}/json"
     
     try:
