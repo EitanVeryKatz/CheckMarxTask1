@@ -1,5 +1,5 @@
  
-from _init_ import DownloadExtractAndFindDependanciesOfLastVersion  
+from __init__ import DownloadExtractAndFindDependanciesOfLastVersion  
 
 
 def main():  

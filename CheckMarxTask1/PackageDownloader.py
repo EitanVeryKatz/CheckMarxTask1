@@ -80,8 +80,8 @@ def extractFile(i_filePath, i_extract_to="extracted"):
     """  
     try:  
         print("began extraction process")  
-        limitedPathLengthsOS = ("win32", "win64")  
-        if sys.platform in limitedPathLengthsOS:  
+        limited_path_lengths_OS = ("win32", "win64")  
+        if sys.platform in limited_path_lengths_OS:  
             i_extract_to = os.path.abspath(i_extract_to)  
             if not i_extract_to.startswith("\\\\?\\"):  
                 i_extract_to = f"\\\\?\\{i_extract_to}"  

@@ -14,12 +14,12 @@ def findDependencyFiles(i_extractPath):
     Returns:  
         list: A list of dependencies found in the package.  
     """  
-    potentialFiles = {"setup.py", "pyproject.toml", "requirements.txt"}  
+    potential_files = {"setup.py", "pyproject.toml", "requirements.txt"}  
     found = {}  
     metadata_path = None  
 
     for root, dirs, files in os.walk(i_extractPath):  
-        for name in potentialFiles:  
+        for name in potential_files:  
             if name in files:  
                 full_path = os.path.join(root, name)  
                 with open(full_path, "r", encoding="utf-8", errors="ignore") as f:  
@@ -41,9 +41,9 @@ def findDependencyFiles(i_extractPath):
         except Exception as e:  
             print(f"Failed to read METADATA in {metadata_path}: {e}")  
 
-    for fileName in potentialFiles:  
-        if fileName not in found:  
-            print(f"{fileName} not found")  
+    for file_name in potential_files:  
+        if file_name not in found:  
+            print(f"{file_name} not found")  
 
     return parseRequirements(found)  
 
@@ -60,21 +60,21 @@ def parseRequirements(i_requirements):
     """  
     dependencies = []  
 
-    for fileName, fileContent in i_requirements.items():  
-        if fileName == "setup.py":  
-            ParseSetupPy(fileContent, dependencies)  
-        elif fileName == "pyproject.toml":  
-            parse_pyproject_toml(fileContent, dependencies)  
-        elif fileName == "requirements.txt":  
-            parse_requirements_txt(fileContent, dependencies)  
-        elif fileName == "METADATA":  
-            parse_metadata_file(fileContent, dependencies)  
+    for file_name, file_content in i_requirements.items():  
+        if file_name == "setup.py":  
+            ParseSetupPy(file_content, dependencies)  
+        elif file_name == "pyproject.toml":  
+            parse_pyproject_toml(file_content, dependencies)  
+        elif file_name == "requirements.txt":  
+            parse_requirements_txt(file_content, dependencies)  
+        elif file_name == "METADATA":  
+            parse_metadata_file(file_content, dependencies)  
 
     dependencies = list(set(dependencies))  
     return dependencies  
 
 
-def parse_requirements_txt(fileContent, dependancies):  
+def parse_requirements_txt(file_content, dependancies):  
     """  
     Parses a requirements.txt file and extracts dependencies.  
 
@@ -82,7 +82,7 @@ def parse_requirements_txt(fileContent, dependancies):
         fileContent (str): The content of the requirements.txt file.  
         dependancies (list): A list to store the extracted dependencies.  
     """  
-    lines = fileContent.splitlines()  
+    lines = file_content.splitlines()  
     for line in lines:  
         line = line.strip()  
         if line and not line.startswith("#"):  
@@ -91,7 +91,7 @@ def parse_requirements_txt(fileContent, dependancies):
     return None  
 
 
-def parse_metadata_file(fileContent, dependencies):  
+def parse_metadata_file(file_content, dependencies):  
     """  
     Parses a METADATA file and extracts dependencies.  
 
@@ -99,7 +99,7 @@ def parse_metadata_file(fileContent, dependencies):
         fileContent (str): The content of the METADATA file.  
         dependencies (list): A list to store the extracted dependencies.  
     """  
-    lines = fileContent.splitlines()  
+    lines = file_content.splitlines()  
     for line in lines:  
         line = line.strip()  
         if line.startswith("Requires-Dist:"):  
