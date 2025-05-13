@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a4a53c09-6a36-449a-b422-37661a86e644</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>tarExtractor.py</StartupFile>
+    <StartupFile>test.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,7 +21,12 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DependancyParser.py" />
+    <Compile Include="PackageDownloader.py" />
     <Compile Include="tarExtractor.py" />
+    <Compile Include="test.py" />
+    <Compile Include="VersionFetcher.py" />
+    <Compile Include="_init_.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
